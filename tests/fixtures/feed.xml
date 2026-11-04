@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"><channel><title>栖页 RSS 测试</title><link>https://example.com/</link><description>仅供开发验证的本地订阅源</description><item><title>订阅解析验证：中文标题</title><link>https://example.com/article</link></item><item><title>危险链接应被忽略</title><link>javascript:alert(1)</link></item></channel></rss>

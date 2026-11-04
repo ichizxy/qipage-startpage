@@ -1,0 +1,14 @@
+node_modules/
+.qa/
+*.log
+dist/
+coverage/
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.DS_Store
+Thumbs.db
+# 原始网页参考仅保留在本地，不作为项目源码发布。
+/参考.html

@@ -1,0 +1,351 @@
+/* Two views share the same saved content. The first paint is deliberately quiet. */
+.visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
+.expand-home{display:none}
+.clock-region{position:relative;z-index:9;margin:0 auto 30px;text-align:center;color:#f1f6ee;isolation:isolate}
+.clock-region #clock{display:flex;align-items:baseline;justify-content:center;white-space:nowrap;font-size:82px;line-height:1.1;font-weight:300;letter-spacing:-2px;font-variant-numeric:tabular-nums;text-shadow:0 3px 24px #102a2526;margin:0}
+.clock-region #clock>span{font-size:inherit;vertical-align:baseline;margin:0}
+.clock-region #clock>.clock-colon{margin:0 3px;opacity:.8}
+.clock-region .clock-fraction{display:inline-flex;align-items:baseline;font-size:21px;line-height:1;letter-spacing:0;margin-left:8px;min-width:4ch;font-weight:400;opacity:.85}
+.clock-region #clock-milliseconds{font-size:inherit;vertical-align:baseline;margin:0;letter-spacing:0}
+.clock-region .date{font-size:12px;line-height:1.7;letter-spacing:2px;margin:14px 0 0;color:#dbe6d7}
+body[data-view=minimal] .clock-region{position:fixed;left:50%;top:clamp(64px,15svh,160px);width:min(660px,calc(100% - 48px));transform:translateX(-50%);margin:0}
+body[data-view=minimal] .clock-region #clock{font-size:72px}
+@media(max-width:600px){.clock-region #clock,body[data-view=minimal] .clock-region #clock{font-size:49px;letter-spacing:-1px}.clock-region .clock-fraction{font-size:15px;margin-left:6px}.clock-region .date{font-size:10px;letter-spacing:1px;margin-top:12px}body[data-view=minimal] .clock-region{top:14svh}body[data-view=minimal] main .dashboard{bottom:max(18px,env(safe-area-inset-bottom))}}
+@media(max-height:620px){body[data-view=minimal] .clock-region{top:8svh}body[data-view=minimal] .clock-region #clock{font-size:44px}body[data-view=minimal] .clock-region .clock-fraction{font-size:14px}body[data-view=minimal] .clock-region .date{margin-top:8px;font-size:10px}body[data-view=minimal] main .dashboard{bottom:max(10px,env(safe-area-inset-bottom))}}
+.search-bar{background:rgba(240,247,238,.75);transition:transform .28s ease,background .28s ease,box-shadow .28s ease;border-color:#f5fff02e}
+.search-bar input{color:#20372a}
+#search-focus-veil{position:fixed;inset:0;z-index:8;pointer-events:none;background:#071a141c;backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);opacity:0;visibility:hidden;transition:opacity .28s ease,visibility .28s}
+body.search-focused #search-focus-veil{opacity:1;visibility:visible}
+body.search-focused .search-bar{z-index:10;transform:scale(1.035);background:rgba(248,252,246,.98);border-color:#ffffffba;box-shadow:0 16px 60px #04170f40,0 0 0 4px #f0ffe611}
+body.search-focused .search-bar input{color:#142d1d;font-weight:500}
+body.search-focused .search-bar input::placeholder{color:#627064}
+body.search-focused .engine-toggle #engine-symbol,body.search-focused .search-submit{color:#315d3b}
+body[data-view=minimal]{min-height:100svh}
+body[data-view=minimal]>.topbar,body[data-view=minimal]>footer,body[data-view=minimal] .hero>.eyebrow,body[data-view=minimal] .engine-shortcuts,body[data-view=minimal] .search-tip,body[data-view=minimal] .section-header,body[data-view=minimal] #group-tools,body[data-view=minimal] .widgets,body[data-view=minimal] .discovery,body[data-view=minimal] .bookmark-label,body[data-view=minimal] .bookmark-edit{display:none!important}
+body[data-view=minimal]>main{min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding-top:0;padding-bottom:18svh;gap:0;width:100%}
+body[data-view=minimal] .hero{padding:0;width:100%;margin:0}
+body[data-view=minimal] .search-bar{height:64px;max-width:660px;width:100%;border-radius:19px;margin:0 auto}
+body[data-view=minimal] .search-bar input{font-size:15px;padding-left:21px}
+body[data-view=minimal] .dashboard{position:fixed;left:50%;bottom:max(24px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:2;width:min(660px,calc(100% - 50px));margin:0}
+body[data-view=minimal] .shortcut-strip{display:flex;gap:17px;align-items:center;width:100%}
+body[data-view=minimal] .bookmark-grid{display:flex;flex:1;min-width:0;gap:12px;overflow-x:auto;overflow-y:hidden;padding:8px 2px 11px;scrollbar-width:none;scroll-behavior:smooth}
+body[data-view=minimal] .bookmark-grid::-webkit-scrollbar{display:none}
+body[data-view=minimal] .bookmark{flex:0 0 42px;width:42px}
+body[data-view=minimal] .bookmark>a{padding:0;border-radius:13px;opacity:.78;transition:opacity .2s,transform .2s}
+body[data-view=minimal] .bookmark>a:hover,body[data-view=minimal] .bookmark>a:focus-visible{opacity:1;transform:translateY(-3px);background:transparent}
+body[data-view=minimal] .site-icon{width:42px;height:42px;border-radius:13px;background:#f2f7efec;box-shadow:0 4px 16px #061b111a;font-size:19px}
+body[data-view=minimal] .expand-home{display:grid;place-items:center;flex-shrink:0;width:32px;height:36px;margin-bottom:3px;border:1px solid #dfeadc21;border-radius:11px;color:#ecf6e5b3;background:#eff8e905}
+body[data-view=minimal] .expand-home:hover{background:#eff8e917;color:#f2ffeb}
+body[data-view=minimal] .expand-home svg{width:15px;height:15px}
+body[data-view=expanded]>.topbar,body[data-view=expanded] .dashboard{animation:home-reveal .28s ease both}
+@keyframes home-reveal{from{opacity:0}to{opacity:1}}
+.context-menu{position:fixed;z-index:40;width:230px;max-width:calc(100vw - 16px);max-height:calc(100svh - 16px);overflow-y:auto;padding:7px;background:var(--dialog);border:1px solid var(--line);border-radius:14px;box-shadow:0 18px 55px #00130b66;font-size:12px;scrollbar-width:thin;animation:home-reveal .12s ease}
+.context-menu>button{display:flex;align-items:center;justify-content:space-between;gap:15px;width:100%;min-height:36px;padding:8px 11px;border-radius:8px;text-align:left;color:var(--text)}
+.context-menu>button>span{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.context-menu>button:focus{background:var(--input);color:var(--accent);outline:none}
+.context-menu>button:disabled{opacity:.3;cursor:default;background:none;color:var(--muted)}
+.context-menu kbd{font-family:inherit;font-size:10px;color:var(--muted);white-space:nowrap}
+.context-separator{height:1px;background:var(--line);margin:5px 7px}
+#paste-content{display:block;width:100%;padding:12px;resize:vertical;min-height:110px}
+@media(max-width:600px){body[data-view=minimal]>main{padding-left:25px;padding-right:25px;padding-bottom:18svh;gap:0}body[data-view=minimal] .search-bar{height:58px;border-radius:17px}body[data-view=minimal] .search-bar input{font-size:13px;padding-left:13px}body[data-view=minimal] .shortcut-strip{gap:10px}body[data-view=minimal] .bookmark-grid{gap:13px}body[data-view=minimal] .site-icon{width:38px;height:38px;border-radius:12px}body[data-view=minimal] .bookmark{width:38px;flex-basis:38px}body.search-focused .search-bar{transform:scale(1.02)}.context-menu{font-size:12px}}
+@media(prefers-reduced-motion:reduce){body[data-view=expanded]>.topbar,body[data-view=expanded] .dashboard,.context-menu{animation:none}.search-bar,#search-focus-veil{transition:none}body.search-focused .search-bar{transform:none}}
+
+/* A fixed-width slot keeps proximity calculations stable while icons magnify. */
+body[data-view=minimal] .dashboard{width:max-content;max-width:min(880px,calc(100vw - 48px))}
+body[data-view=minimal] .shortcut-strip{position:relative;display:block;width:100%;isolation:isolate}
+body[data-view=minimal] .shortcut-strip::before{content:"";position:absolute;left:0;right:0;bottom:0;height:70px;border-radius:24px;border:1px solid #efffeb32;background:linear-gradient(180deg,#f3fff324,#e6f4e814);box-shadow:0 12px 40px #051c2326,inset 0 1px #f8fff22b;backdrop-filter:blur(18px) saturate(1.25);-webkit-backdrop-filter:blur(18px) saturate(1.25);pointer-events:none}
+body[data-view=minimal] .bookmark-grid{position:relative;z-index:1;width:max-content;max-width:100%;flex:none;gap:12px;padding:48px 34px 15px;scroll-behavior:auto}
+body[data-view=minimal] .bookmark>a,body[data-view=minimal] .bookmark>a:hover,body[data-view=minimal] .bookmark>a:focus-visible{transform:translate3d(var(--dock-shift,0px),var(--dock-lift,0px),0) scale(var(--dock-scale,1));transform-origin:center bottom;transition:transform .18s cubic-bezier(.2,.75,.25,1),opacity .18s;will-change:transform}
+body[data-view=minimal] .bookmark>a{opacity:.9}
+body[data-view=minimal] .bookmark>a:hover,body[data-view=minimal] .bookmark>a:focus-visible{opacity:1}
+body[data-view=minimal] .site-icon{transition:box-shadow .2s,transform .16s}
+body[data-view=minimal] .bookmark>a:hover .site-icon{box-shadow:0 9px 18px #071b2533,inset 0 1px #fff9}
+body[data-view=minimal] .bookmark>a:active .site-icon{transform:scale(.9)}
+body[data-view=minimal]>.expand-home{position:fixed;top:max(26px,env(safe-area-inset-top));right:32px;z-index:3;margin:0;width:38px;height:38px;border-radius:12px;background:#f0faed0d;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+@media(max-width:600px){body[data-view=minimal] .dashboard{max-width:calc(100vw - 32px)}body[data-view=minimal] .bookmark-grid{padding:43px 25px 12px;gap:10px}body[data-view=minimal] .shortcut-strip::before{height:62px;border-radius:21px}body[data-view=minimal]>.expand-home{right:20px;top:max(20px,env(safe-area-inset-top));width:35px;height:35px}}
+@media(prefers-reduced-motion:reduce){body[data-view=minimal] .bookmark>a,body[data-view=minimal] .bookmark>a:hover,body[data-view=minimal] .bookmark>a:focus-visible{transform:none;transition:none;will-change:auto}body[data-view=minimal] .bookmark>a:active .site-icon{transform:none}}
+
+/* One local vector family for search, menus, settings, and known website shortcuts. */
+.engine-badge{--engine-cutout:var(--theme-icon-bg,#e7f0e3);display:inline-grid;place-items:center;background:var(--theme-icon-bg,#e7f0e3);color:var(--theme-icon-ink,#3b6957);border-radius:10px;flex-shrink:0}
+.engine-glyph{width:20px;height:20px;display:block;flex-shrink:0}
+.engine-toggle #engine-symbol{display:inline-grid;place-items:center;width:31px;height:31px;border-radius:10px;background:#3c63490b;color:var(--theme-icon-ink,#3b6957)}
+.engine-toggle #engine-symbol .engine-glyph{width:21px;height:21px}
+.engine-menu .engine-badge{width:30px;height:30px;min-width:30px;border-radius:9px}
+.engine-menu .engine-badge .engine-glyph{width:18px;height:18px}
+.engine-list-symbol.engine-badge{width:34px;height:34px;background:var(--theme-icon-bg,#e7f0e3);color:var(--theme-icon-ink,#3b6957);border:1px solid #48693a12}
+.engine-shortcuts .engine-tabs button{display:inline-flex;align-items:center;gap:5px}
+.engine-shortcuts .engine-tabs .engine-glyph{width:13px;height:13px}
+.engine-custom-symbol{display:inline-block;font-size:16px;line-height:1;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.engine-icon-heading{display:flex;align-items:center;justify-content:space-between;margin-top:16px;font-size:12px}
+#custom-engine-preview{width:34px;height:34px}
+.engine-icon-picker{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:7px;margin-top:10px}
+.engine-icon-option{width:100%;aspect-ratio:1;border:1px solid transparent;border-radius:10px;transition:transform .15s,box-shadow .15s,background .15s}
+.engine-icon-option:hover{background:#d9e9d0;transform:translateY(-2px)}
+.engine-icon-option[aria-pressed=true]{outline:2px solid var(--accent);outline-offset:2px;box-shadow:0 0 0 4px #99bd8a12}
+.site-icon .engine-glyph{width:24px;height:24px}
+.site-icon .fallback .engine-glyph{width:22px;height:22px;opacity:.65}
+body[data-view=minimal] .site-icon.engine-badge{background:var(--theme-icon-bg,#e7f0e3);color:var(--theme-icon-ink,#3b6957)}
+@media(max-width:420px){.engine-icon-picker{grid-template-columns:repeat(6,minmax(0,1fr))}.engine-icon-option .engine-glyph{width:19px;height:19px}}
+.site-icon.unified-bookmark-icon,body[data-view=minimal] .site-icon.unified-bookmark-icon{--engine-cutout:var(--theme-icon-bg,#e7f0e3);background:var(--theme-icon-bg,#e7f0e3);color:var(--theme-icon-ink,#3b6957);border:1px solid #43694310}
+.bookmark-upload-mask{display:block;width:26px;height:26px;background:currentColor;-webkit-mask:var(--bookmark-mask) center/contain no-repeat;mask:var(--bookmark-mask) center/contain no-repeat}
+#bookmark-icon-preview .site-icon{width:38px;height:38px;border-radius:12px;box-shadow:none}
+#bookmark-icon-preview .engine-glyph{width:23px;height:23px}
+#bookmark-icon-status{line-height:1.8}
+.dock-item-name{display:none}
+.dock-folder-cover{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:calc(var(--dock-size,42px) * .055);padding:calc(var(--dock-size,42px) * .09)!important;background:var(--theme-folder-bg,#d5e6d3)!important}
+.folder-preview-cell{display:grid;place-items:center;min-width:0;min-height:0;border-radius:calc(var(--dock-size,42px) * .08);overflow:hidden;background:var(--theme-icon-bg,#f2f8efb3)}
+.dock-folder-cover .folder-preview-cell .site-icon{width:100%!important;height:100%!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:transparent!important}
+.dock-folder-cover .folder-preview-cell .engine-glyph,.dock-folder-cover .folder-preview-cell .bookmark-upload-mask{width:76%!important;height:76%!important}
+.folder-preview-count{font-size:calc(var(--dock-size,42px) * .19);font-weight:650;line-height:1;color:var(--theme-icon-ink,#3b6957);letter-spacing:-.05em;font-variant-numeric:tabular-nums}
+.folder-preview-empty{background:#a8c4a52b}
+#dock-move-folder{max-width:140px;padding:6px 8px;font-size:11px}
+.dock-folder-dialog{width:min(620px,calc(100% - 32px));padding:30px;border-radius:28px;background:var(--dialog)}
+.dock-folder-dialog::backdrop{background:#071c2566;backdrop-filter:blur(18px) saturate(.8);-webkit-backdrop-filter:blur(18px) saturate(.8)}
+.dock-folder-dialog .dialog-heading{align-items:flex-start;margin-bottom:24px}
+#dock-folder-title{margin:0;font-size:24px;overflow-wrap:anywhere}
+#dock-folder-count{margin:6px 0 0;font-size:11px}
+.dock-folder-items{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:24px 16px;padding:10px 3px 24px;max-height:55svh;overflow:auto}
+.folder-shortcut{position:relative;min-width:0;text-align:center}
+.folder-shortcut>a{display:flex;flex-direction:column;align-items:center;gap:10px;padding:8px 4px;border-radius:14px}
+.folder-shortcut>a:hover{background:var(--input)}
+.folder-shortcut>a>span:last-child{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}
+body .dock-folder-dialog .site-icon{width:56px;height:56px;border-radius:16px}
+body .dock-folder-dialog .site-icon .engine-glyph,body .dock-folder-dialog .bookmark-upload-mask{width:34px;height:34px}
+.folder-shortcut>button{position:absolute;top:0;right:8px;display:grid;place-items:center;width:23px;height:23px;background:var(--dialog);border:1px solid var(--line);border-radius:50%;opacity:0;color:var(--muted)}
+.folder-shortcut>button svg{width:13px;height:13px}
+.folder-shortcut:hover>button,.folder-shortcut:focus-within>button{opacity:1}
+.dock-folder-picker{max-height:42svh;overflow:auto;display:grid;gap:5px;padding:4px}
+dialog .folder-pick-row{display:flex;align-items:center;gap:12px;padding:10px;border-radius:12px;background:var(--input);cursor:pointer}
+.folder-pick-row>input{width:17px;height:17px;accent-color:var(--accent);flex:none}
+body .folder-pick-row .site-icon{width:32px;height:32px;border-radius:9px;flex:none}
+body .folder-pick-row .site-icon .engine-glyph,body .folder-pick-row .bookmark-upload-mask{width:21px;height:21px}
+.folder-pick-row>span:last-child{min-width:0}
+.folder-pick-row b,.folder-pick-row small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:400}
+.folder-pick-row small{font-size:10px;color:var(--muted);margin-top:2px}
+body.dock-folder-open .dock-active{pointer-events:none}
+@media(hover:none){.folder-shortcut>button{opacity:1}}
+@media(max-width:480px){.dock-folder-dialog{padding:22px}.dock-folder-items{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px 8px}}
+.dock-edit-toolbar{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px;padding:10px 14px;border:1px solid var(--line);border-radius:14px;background:var(--dialog);color:var(--text);box-shadow:0 8px 26px #03180e33;font-size:12px}
+.dock-edit-toolbar[hidden]{display:none}
+body[data-view=minimal] .dock-edit-toolbar{position:fixed;z-index:20;bottom:auto;transform:none;width:max-content;max-width:calc(100vw - 32px);max-height:calc(100svh - 24px);overflow-y:auto;color:var(--theme-dialog-text,var(--text))}
+.dock-edit-toolbar button{padding:6px 10px;border-radius:8px;background:var(--input);white-space:nowrap}
+.dock-edit-toolbar button:focus-visible,.dock-select:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+#dock-delete-selected{color:#ca6156}#dock-delete-selected:disabled{opacity:.4;cursor:default}
+.dock-select{appearance:none;-webkit-appearance:none;position:absolute;z-index:3;top:-5px;right:-5px;width:clamp(18px,calc(var(--dock-size,42px) * .36),22px);height:clamp(18px,calc(var(--dock-size,42px) * .36),22px);margin:0;padding:0;border:1.5px solid #3b695780;border-radius:6px;background:var(--theme-icon-bg,#e7f0e3) center/85% no-repeat;box-shadow:0 0 0 2px var(--theme-icon-bg,#e7f0e3),0 3px 8px #193e2e26;cursor:pointer;transition:background-color .16s,border-color .16s,box-shadow .16s,transform .16s}
+.dock-select:hover{border-color:var(--theme-icon-ink,#3b6957);transform:scale(1.08)}
+.dock-select:checked{border-color:var(--theme-icon-ink,#3b6957);background-color:var(--theme-icon-ink,#3b6957);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e7f0e3' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 12 4 4 8-8'/%3E%3C/svg%3E")}
+.dock-select:active{transform:scale(.94)}
+.dock-select:focus-visible{outline:2px solid var(--theme-icon-ink,#3b6957);outline-offset:4px;box-shadow:0 0 0 4px var(--theme-icon-bg,#e7f0e3),0 3px 8px #193e2e26}
+@media(prefers-reduced-motion:reduce){.dock-select{transition:none}.dock-select:hover,.dock-select:active{transform:none}}
+@media(forced-colors:active){.dock-select{appearance:auto;-webkit-appearance:checkbox;background-image:none;box-shadow:none;forced-color-adjust:auto}}
+body.dock-editing .bookmark>a,body.dock-editing .bookmark>a:hover,body.dock-editing .bookmark>a:focus-visible{transform:none!important;opacity:1}
+body.dock-editing .dock-selected>a>.site-icon{outline:2px solid #b5d6ae;outline-offset:4px}
+body.dock-editing .bookmark{position:relative}
+body.dock-editing #bookmarks a{cursor:grab;touch-action:none;user-select:none;-webkit-user-drag:none}
+body.dock-editing #bookmarks a .site-icon{pointer-events:none}
+body.dock-sorting{user-select:none;cursor:grabbing}
+body.dock-sorting #bookmarks a{cursor:grabbing}
+.dock-sort-source{opacity:.25;outline:1px dashed #d4ecd0;border-radius:13px}
+.dock-sort-ghost{position:fixed;z-index:30;pointer-events:none;filter:drop-shadow(0 12px 16px #051c2366);transform:scale(1.08)}
+.dock-sort-ghost .site-icon{width:var(--dock-size,42px);height:var(--dock-size,42px)}
+.dock-sort-ghost .engine-glyph,.dock-sort-ghost .bookmark-upload-mask{width:calc(var(--dock-size,42px) * .62);height:calc(var(--dock-size,42px) * .62)}
+.dock-sort-ghost.outside-dock{opacity:.45}
+.dock-sort-help{flex-basis:100%;text-align:center;color:var(--muted);font-size:10px}
+.dock-tooltip{position:fixed;z-index:6;pointer-events:none;max-width:min(240px,calc(100vw - 16px));padding:7px 12px;border:1px solid #dbead32e;border-radius:9px;background:var(--dialog);color:var(--text);box-shadow:0 6px 24px #03180e33;font-size:11px;line-height:1.5;overflow-wrap:anywhere;text-align:center;animation:home-reveal .12s ease}
+body[data-view=minimal]:is(.dock-show-names,.dock-editing) .dock-item-name{display:block;position:absolute;top:calc(100% + 7px);left:50%;width:max(54px,calc(var(--dock-size,42px) + var(--dock-gap,12px)));transform:translate(calc(-50% + var(--dock-shift,0px)),var(--dock-lift,0px)) scale(var(--dock-scale,1));transform-origin:center top;transition:transform .18s cubic-bezier(.2,.75,.25,1);font-size:var(--dock-name-size,12px);line-height:1.5;color:#e5f0df;text-align:center;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;pointer-events:none}
+body[data-view=minimal]:is(.dock-show-names,.dock-editing) .bookmark-grid{padding-bottom:var(--dock-name-space,44px)}
+body[data-view=minimal]:is(.dock-show-names,.dock-editing) .shortcut-strip::before{height:calc(var(--dock-size,42px) + var(--dock-name-space,44px) + 13px)}
+@media(max-width:600px){body[data-view=minimal]:is(.dock-show-names,.dock-editing) .bookmark-grid{padding-bottom:var(--dock-name-space,44px)}body[data-view=minimal]:is(.dock-show-names,.dock-editing) .shortcut-strip::before{height:calc(var(--dock-size,42px) + var(--dock-name-space,44px) + 13px)}body[data-view=minimal]:is(.dock-show-names,.dock-editing) .dock-item-name{font-size:var(--dock-name-size,12px)}}
+@media(prefers-reduced-motion:reduce){.dock-tooltip{animation:none}body[data-view=minimal]:is(.dock-show-names,.dock-editing) .dock-item-name{transition:none}}
+
+/* Dock preferences are independent from the expanded bookmark grid. */
+.dock-drag-handle{display:none}
+#dock-settings-dialog .setting-row:has(.dock-number-field){display:grid;grid-template-columns:minmax(82px,1fr) minmax(70px,1.4fr) 100px;gap:12px;padding:8px 0}
+#dock-settings-dialog .setting-row input[type=range]{width:100%;margin:0}
+.dock-number-field{display:flex;align-items:center;gap:4px;color:var(--muted);font-size:11px;font-variant-numeric:tabular-nums}
+.dock-number-field input{width:78px;padding:6px 3px;text-align:right;border-color:transparent;background:transparent;border-radius:6px;appearance:textfield;-moz-appearance:textfield}
+.dock-number-field input::-webkit-inner-spin-button,.dock-number-field input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.dock-number-field input:hover,.dock-number-field input:focus{background:var(--input);border-color:var(--line)}
+.dock-number-field input:invalid{border-color:#ca6156}
+@media(max-width:420px){#dock-settings-dialog .setting-row:has(.dock-number-field){grid-template-columns:minmax(70px,1fr) minmax(45px,1fr) 90px;gap:6px}.dock-number-field input{width:68px}}
+body[data-view=minimal] .dashboard{max-width:min(var(--dock-width,880px),calc(100vw - 32px))}
+body[data-view=minimal].dock-positioned .dashboard{left:var(--dock-center-x,50vw);top:var(--dock-center-y,85vh);bottom:auto;transform:translate(-50%,-50%)}
+body[data-view=minimal] .bookmark-grid{gap:var(--dock-gap,12px);padding:var(--dock-headroom,48px) max(28px,calc(var(--dock-headroom,48px) * .65)) 15px}
+body[data-view=minimal] .bookmark{width:var(--dock-size,42px);flex-basis:var(--dock-size,42px)}
+body[data-view=minimal] .site-icon{width:var(--dock-size,42px);height:var(--dock-size,42px);border-radius:calc(var(--dock-size,42px) * .3)}
+body[data-view=minimal] .site-icon .engine-glyph,body[data-view=minimal] .bookmark-upload-mask{width:calc(var(--dock-size,42px) * .62);height:calc(var(--dock-size,42px) * .62)}
+body[data-view=minimal] .shortcut-strip::before{height:calc(var(--dock-size,42px) + 28px);background:rgb(231 244 229 / var(--dock-tray-alpha,.2))}
+body[data-view=minimal]:is(.dock-show-names,.dock-editing) .shortcut-strip::before{height:calc(var(--dock-size,42px) + var(--dock-name-space,44px) + 13px)}
+body[data-view=minimal]:is(.dock-show-names,.dock-editing) .bookmark-grid{padding-bottom:var(--dock-name-space,44px)}
+body[data-view=minimal] .bookmark>a,body[data-view=minimal] .bookmark>a:hover,body[data-view=minimal] .bookmark>a:focus-visible,body[data-view=minimal] .dock-item-name{transition-duration:var(--dock-speed,180ms)}
+body[data-view=minimal].dock-no-zoom .bookmark>a{transform:none!important}
+body[data-view=minimal].dock-movable .bookmark-grid{padding-left:50px}
+body[data-view=minimal].dock-movable .dock-drag-handle{display:grid;place-items:center;position:absolute;z-index:3;left:9px;bottom:16px;width:26px;height:var(--dock-size,42px);border-radius:9px;color:var(--theme-icon-bg,#e7f0e3);cursor:grab;touch-action:none;font-size:24px}
+body[data-view=minimal]:is(.dock-show-names,.dock-editing) .dock-drag-handle{bottom:calc(var(--dock-name-space,44px) + 1px)}
+.dock-drag-handle:hover,.dock-drag-handle:focus-visible{background:#e7f0e325}
+body.dock-dragging{user-select:none}body.dock-dragging .dock-drag-handle{cursor:grabbing}
+@media(prefers-reduced-motion:reduce){body[data-view=minimal] .bookmark>a,body[data-view=minimal] .dock-item-name{transition:none!important}}
+
+body[data-view=minimal].dock-editing .dock-name-edit{pointer-events:auto;cursor:text;min-height:24px;margin-top:-3px;padding:2px 4px;border:1px dashed #e5f0df55;border-radius:5px;transform:translateX(-50%)!important;background:#193e2e38;color:#f1f8ec}
+body[data-view=minimal].dock-editing .dock-name-edit:hover,body[data-view=minimal].dock-editing .dock-name-edit:focus-visible{border-color:#e5f0df;background:#193e2e80}
+body[data-view=minimal].dock-no-zoom .dock-item-name{transform:translateX(-50%)}
+#dock-tooltip{font-size:var(--dock-name-size,12px)}
+@media(prefers-reduced-motion:reduce){body[data-view=minimal] .dock-item-name{transform:translateX(-50%)!important}}
+
+body[data-view=minimal] .bookmark-add-item{display:none!important}
+.site-icon .bookmark-site-icon{width:66%;height:66%;object-fit:contain;filter:grayscale(var(--site-icon-gray,.2));border-radius:3px}
+.dock-folder-cover .folder-preview-cell .bookmark-site-icon{width:76%!important;height:76%!important}
+#bookmark-fetch-icon{margin:0 0 12px}
+
+#bookmark-form .bookmark-gray-control{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+#bookmark-form .bookmark-gray-control input[type=range]{flex:1;min-width:80px}
+
+.theme-color-row{justify-content:flex-start;flex-wrap:wrap}
+#theme-color-picker{width:42px;height:32px;padding:2px;border-radius:8px;margin-left:auto;cursor:pointer}
+#theme-color-hex{width:98px;padding:6px 8px;font-variant-numeric:tabular-nums}
+.theme-color-presets{display:flex;gap:10px;padding:10px 0 14px}
+.theme-color-presets button{width:26px;height:26px;background:var(--swatch-color);border:2px solid #fff7;border-radius:50%}
+.theme-color-presets button[aria-pressed=true]{outline:2px solid var(--accent);outline-offset:3px}
+#theme-color-status{line-height:1.8}
+.search-bar,body[data-view=minimal] .search-bar,body.search-focused .search-bar{background:var(--theme-search,#eff6ef);color:var(--theme-icon-ink,#3b6957)}
+.search-bar input,body.search-focused .search-bar input{color:var(--theme-icon-ink,#3b6957)}
+.engine-toggle #engine-symbol,.search-submit,body.search-focused .engine-toggle #engine-symbol,body.search-focused .search-submit{color:var(--theme-icon-ink,#3b6957)}
+body[data-view=minimal] .shortcut-strip::before{background:rgb(var(--theme-rgb,231 244 229) / var(--dock-tray-alpha,.2))}
+
+.dock-select{border-color:color-mix(in srgb,var(--theme-icon-ink,#3b6957) 50%,transparent)}
+body.dock-editing .dock-selected>a>.site-icon{outline-color:var(--accent)}
+.engine-icon-option:hover{background:var(--theme-icon-bg,#e7f0e3)}
+
+.clock-surface{display:inline-block;max-width:100%;padding:16px 24px;border-radius:24px;background:rgb(var(--clock-background-rgb,0 0 0) / var(--clock-background-alpha,.14));backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 8px 32px #0000000a;border:1px solid #ffffff12;color:var(--clock-text-color,#fff)}
+.clock-region #clock,.clock-region .date{color:var(--clock-text-color,#fff)}
+.clock-region .date{opacity:.88}
+#clock-settings-dialog .setting-row{flex-wrap:wrap}
+#clock-settings-dialog input[type=color]{width:42px;height:30px;padding:2px;cursor:pointer}
+#clock-settings-dialog input[type=range]{flex:1;min-width:70px}
+@media(max-width:600px){.clock-surface{padding:14px 16px;border-radius:20px}}
+@media(max-height:620px){.clock-surface{padding:10px 16px}}
+
+body.clock-panel-off .clock-surface{backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:none;border-color:transparent}
+
+/* Full view: search and navigation first, tools in a compact grid. */
+body[data-view=expanded]>.topbar{height:64px;max-width:1200px;margin:auto;padding:0 34px}
+body[data-view=expanded] .brand{font-size:20px;letter-spacing:1px}
+body[data-view=expanded] .brand img{width:28px;height:28px}
+body[data-view=expanded]>main{max-width:1200px;padding:0 34px}
+body[data-view=expanded] .hero{display:grid;grid-template-columns:minmax(260px,.8fr) minmax(0,1.4fr);gap:12px 32px;align-items:center;padding:12px 0 28px}
+body[data-view=expanded] .clock-region{grid-column:1;grid-row:1/3;margin:0;min-width:0}
+body[data-view=expanded] .clock-region #clock{font-size:52px;letter-spacing:-1px}
+body[data-view=expanded] .clock-region .clock-fraction{font-size:15px;margin-left:5px}
+body[data-view=expanded] .clock-region .date{font-size:11px;letter-spacing:1px;margin-top:9px}
+body[data-view=expanded] .clock-surface{padding:12px 18px;border-radius:18px}
+body[data-view=expanded] .search-bar{grid-column:2;grid-row:1;width:100%;max-width:none;height:54px;border-radius:14px;margin:0}
+body[data-view=expanded] .engine-shortcuts{grid-column:2;grid-row:2;justify-content:flex-start;gap:10px;margin:0;padding-left:4px;min-width:0}
+body[data-view=expanded] .engine-shortcuts .engine-tabs{justify-content:flex-start;gap:14px;flex-wrap:wrap}
+body[data-view=expanded] .dashboard{display:grid;gap:20px}
+body[data-view=expanded] .navigation{padding:16px 20px 20px;background:var(--panel);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--line);border-radius:18px;min-width:0}
+body[data-view=expanded] .section-header{margin-bottom:14px;min-height:38px}
+body[data-view=expanded] .group-tabs{gap:22px}
+body[data-view=expanded] .group-tabs button{font-size:12px;letter-spacing:0;padding-bottom:10px}
+body[data-view=expanded] .bookmark-grid{padding:0;gap:14px 12px}
+body[data-view=expanded] .bookmark>a{padding:8px 3px;gap:8px}
+body[data-view=expanded] .bookmark-add-item{display:none}
+body[data-view=expanded] .bookmark-label{color:var(--text);font-size:11px;letter-spacing:0}
+body[data-view=expanded] .widgets{grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin:0}
+body[data-view=expanded] .widgets>.widget{min-height:224px;padding:18px;border-radius:18px}
+body[data-view=expanded] .widget-heading{font-size:12px;letter-spacing:0;margin-bottom:14px}
+body[data-view=expanded] .notes-card textarea{min-height:118px;font-size:12px;line-height:1.8}
+body[data-view=expanded] .note-footer{justify-content:flex-end}
+body[data-view=expanded] .todo-list{height:112px}
+body[data-view=expanded] .todo-empty{font-size:12px}
+body[data-view=expanded] .discovery{margin:0;padding:16px 20px;min-height:0}
+body[data-view=expanded] .feed-message{font-size:12px;padding:12px 0 0;color:var(--muted)}
+body[data-view=expanded] .rss-form{margin-top:12px}
+body[data-view=expanded].weather-off .weather-main,body[data-view=expanded].weather-off .weather-card .source{display:none}
+body[data-view=expanded].weather-off #weather-detail{margin:auto 0;font-size:12px;line-height:1.8}
+body[data-view=expanded]>footer{max-width:1200px;margin:0 auto;justify-content:flex-end;padding:16px 34px 24px;font-size:11px}
+@media(max-width:1000px){body[data-view=expanded] .widgets{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){body[data-view=expanded] .hero{grid-template-columns:minmax(0,1fr);gap:14px;padding:14px 0 24px}body[data-view=expanded] .clock-region{grid-column:1;grid-row:1}body[data-view=expanded] .search-bar{grid-column:1;grid-row:2}body[data-view=expanded] .engine-shortcuts{grid-column:1;grid-row:3;justify-content:center}body[data-view=expanded] .engine-shortcuts .engine-tabs{justify-content:center}body[data-view=expanded]>.topbar,body[data-view=expanded]>main{padding-left:20px;padding-right:20px}}
+@media(max-width:480px){body[data-view=expanded] .widgets{grid-template-columns:minmax(0,1fr)}body[data-view=expanded] .navigation{padding:12px 14px 16px}body[data-view=expanded] .widgets>.widget{min-height:200px}body[data-view=expanded] .bookmark-grid{grid-template-columns:repeat(4,minmax(0,1fr))}body[data-view=expanded] .clock-region #clock{font-size:44px}body[data-view=expanded]>footer{padding:14px 20px 20px}}
+
+/* Each themed surface owns its foreground; wallpaper cannot change its contrast. */
+body[data-view=expanded] .navigation,.widget{background:var(--theme-surface);--text:var(--theme-surface-text);--muted:var(--theme-surface-text);color:var(--theme-surface-text)}
+dialog,.engine-menu,.context-menu,.dock-tooltip{--text:var(--theme-dialog-text);--muted:var(--theme-dialog-text);color:var(--theme-dialog-text);background:var(--dialog)}
+body[data-view=expanded] .bookmark-label,body[data-view=expanded] .group-tabs button,body[data-view=expanded] .subtle-button{color:var(--theme-surface-text)}
+body[data-view=expanded] .bookmark-label{font-size:12px;font-weight:500}
+body[data-view=expanded] .bookmark>a:hover,body[data-view=expanded] .bookmark>a:focus-visible{background:var(--theme-control)}
+body[data-view=expanded] .bookmark>a:hover .bookmark-label,body[data-view=expanded] .bookmark>a:focus-visible .bookmark-label{color:var(--theme-control-text)}
+.primary-button,body.light .primary-button{background:var(--accent);color:var(--theme-primary-text)}
+.primary-button:hover,body.light .primary-button:hover{background:var(--accent);box-shadow:inset 0 0 0 1px currentColor}
+.secondary-button,.secondary-button:hover,.timer-modes button.active{background:var(--theme-control);color:var(--theme-control-text)}
+input,select,textarea{color:var(--theme-control-text);background-color:var(--theme-control)}
+input::placeholder,textarea::placeholder{color:inherit;opacity:1}
+.notes-card textarea{background:transparent;color:var(--theme-surface-text)}
+.search-bar,body[data-view=minimal] .search-bar,body.search-focused .search-bar{color:var(--theme-search-text)}
+.search-bar input,body.search-focused .search-bar input{color:var(--theme-search-text);background:transparent}
+.search-bar input::placeholder,body.search-focused .search-bar input::placeholder{color:var(--theme-search-text);opacity:1}
+.engine-toggle #engine-symbol,.search-submit,body.search-focused .engine-toggle #engine-symbol,body.search-focused .search-submit,.search-key{color:var(--theme-search-text)}
+body[data-view=expanded] .engine-shortcuts{background:var(--theme-surface);padding:9px 12px;border:1px solid var(--line);border-radius:12px;color:var(--theme-surface-text)}
+body[data-view=expanded] .engine-tabs button,body[data-view=expanded] .engine-tabs button.active,body[data-view=expanded] .engine-manage-link{color:var(--theme-surface-text);opacity:1}
+body[data-view=expanded] .engine-tabs button.active:after{background:var(--theme-surface-text)}
+body[data-view=expanded] .brand,body[data-view=expanded] .top-actions .icon-button,body[data-view=expanded]>footer button{background:var(--theme-surface);color:var(--theme-surface-text);border-radius:12px}
+body[data-view=expanded] .brand{padding:5px 10px}
+body[data-view=expanded]>footer button{padding:7px 12px}
+.widget .source,.widget .save-status,.widget .todo-item.done label{color:var(--theme-surface-text);opacity:1}
+.widget .muted,.widget .weather-location,.widget .todo-empty,.widget .timer-modes button,.widget .discovery-tabs button,.widget .feed-item{color:var(--theme-surface-text)}
+.widget .timer-modes button.active{color:var(--theme-control-text)}
+.folder-preview-count{color:var(--theme-icon-text)}
+.engine-menu button:hover,.context-menu>button:focus,.engine-icon-option:hover{background:var(--theme-control);color:var(--theme-control-text)}
+
+.browser-bookmarks-list{max-height:42svh;overflow:auto;display:grid;gap:6px;padding:4px}.browser-bookmark-row{display:flex;gap:10px;padding:10px;background:var(--theme-control);color:var(--theme-control-text);border-radius:10px;cursor:pointer}.browser-bookmark-row input{width:17px;height:17px;flex:none;margin:3px 0 0;accent-color:var(--accent)}.browser-bookmark-row>span{min-width:0}.browser-bookmark-row b,.browser-bookmark-row small{display:block;overflow-wrap:anywhere}.browser-bookmark-row b{font-size:12px;font-weight:500}.browser-bookmark-row small{font-size:10px;margin-top:3px}
+
+.folder-shortcut>button.folder-open-button{position:static;display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;height:auto;opacity:1;background:transparent;border:0;border-radius:14px;padding:8px 4px;color:inherit}.folder-shortcut>button.folder-open-button:hover{background:var(--input)}.folder-open-button>span:last-child{font-size:12px;white-space:nowrap}.folder-shortcut>button.folder-open-button svg{width:76%;height:76%}
+
+/* Keep selected tabs and editing controls legible on their own themed surface. */
+body[data-view=expanded] .group-tabs button.active{color:var(--theme-surface-text);border-color:var(--accent);border-bottom-width:3px;font-weight:700}
+body[data-view=expanded] .group-tools button{background:var(--theme-control);color:var(--theme-control-text);border:1px solid var(--accent);opacity:1}
+body[data-view=expanded] .group-tools span,body[data-view=expanded] .section-tools .subtle-button{color:var(--theme-surface-text)}
+body[data-view=expanded] .section-tools .subtle-button:hover{background:var(--theme-control);color:var(--theme-control-text)}
+.toast{background:var(--dialog);color:var(--theme-dialog-text);display:flex;align-items:center;justify-content:center;gap:16px;z-index:30}
+.toast-undo{background:var(--accent);color:var(--theme-primary-text);border-radius:7px;padding:5px 12px;white-space:nowrap;font-weight:600}
+.toast-undo:hover{background:var(--accent);outline:1px solid currentColor}
+/* A single focused menu item follows either keyboard or pointer navigation. */
+.context-menu>button{transition:none}
+.context-menu>button:hover:not(:focus){background:transparent;color:var(--text)}
+.dock-overflow{display:none}
+body[data-view=minimal] .dock-overflow{display:grid;place-items:center;position:absolute;z-index:2;bottom:16px;width:24px;height:28px;padding:0;border-radius:8px;background:rgb(var(--theme-rgb,231 244 229) / .12);color:var(--theme-icon-ink,var(--accent));font-size:18px;line-height:1;opacity:.6;box-shadow:none;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);transition:opacity .15s,background .15s}
+body[data-view=minimal] .dock-overflow:hover,body[data-view=minimal] .dock-overflow:focus-visible{opacity:1;background:rgb(var(--theme-rgb,231 244 229) / .25)}
+.dock-overflow-left{left:3px}.dock-overflow-right{right:3px}
+body[data-view=minimal]:is(.dock-show-names,.dock-editing) .dock-overflow{bottom:var(--dock-name-space,44px)}
+.folder-view-switch{display:flex;gap:4px;margin:0 0 14px;padding:4px;border-radius:10px;background:var(--input);width:max-content}
+.folder-view-switch button{padding:6px 12px;border-radius:7px;font-size:12px}
+.folder-view-switch button[aria-pressed=true]{background:var(--theme-control);color:var(--theme-control-text);box-shadow:0 1px 4px #0001}
+#dock-folder-items[data-view=grid] .folder-shortcut>a,#dock-folder-items[data-view=grid] .folder-open-button{width:100%;min-height:108px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:10px 6px;border-radius:14px}
+#dock-folder-items .folder-shortcut>.folder-open-button{position:static;opacity:1;border:0;background:transparent;height:auto;color:inherit}
+#dock-folder-items .folder-open-button:hover{background:var(--input)}
+#dock-folder-items[data-view=list]{grid-template-columns:minmax(0,1fr);gap:6px}
+#dock-folder-items[data-view=list] .folder-shortcut{border-radius:12px;background:var(--input);text-align:left}
+#dock-folder-items[data-view=list] .folder-shortcut>a,#dock-folder-items[data-view=list] .folder-open-button{display:flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:12px;width:100%;padding:12px 40px 12px 12px;text-align:left}
+#dock-folder-items[data-view=list] .site-icon{width:40px;height:40px;flex-shrink:0;border-radius:10px}
+#dock-folder-items[data-view=list] .site-icon .engine-glyph,#dock-folder-items[data-view=list] .bookmark-upload-mask{width:26px;height:26px}
+#dock-folder-items[data-view=list] .folder-item-text{display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
+.folder-item-text small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;opacity:.65;margin-top:3px}
+#dock-folder-items[data-view=list] [data-folder-remove]{top:50%;transform:translateY(-50%);right:10px}
+.folder-navigation-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.folder-navigation-row #dock-folder-breadcrumbs{flex:1;min-width:0;overflow-wrap:anywhere}
+.folder-navigation-row .folder-view-switch{flex:none;margin:0}
+body #dock-folder-items[data-view=grid] .folder-shortcut>a,body #dock-folder-items[data-view=grid] .folder-open-button{aspect-ratio:auto;min-height:116px;height:auto}
+body #dock-folder-items[data-view=grid] .folder-shortcut>a>.site-icon,body #dock-folder-items[data-view=grid] .folder-open-button>.site-icon{width:64px;height:64px;flex:0 0 64px;border-radius:18px}
+body #dock-folder-items[data-view=grid] .site-icon .engine-glyph,body #dock-folder-items[data-view=grid] .bookmark-upload-mask{width:38px;height:38px}
+body #dock-folder-items[data-view=grid] .folder-shortcut>a>span:last-child,body #dock-folder-items[data-view=grid] .folder-open-button>span:last-child{display:block;flex-shrink:0;width:100%;min-height:20px;max-height:40px;line-height:20px;font-size:12px;color:var(--theme-dialog-text,var(--text));white-space:normal;overflow:hidden;overflow-wrap:anywhere}
+#dock-folder-dialog>.dialog-actions{flex-wrap:wrap}
+@keyframes folder-wiggle{from{transform:rotate(-1deg)}to{transform:rotate(1deg)}}
+#dock-folder-items.folder-editing .folder-shortcut{animation:folder-wiggle .16s ease-in-out infinite alternate;touch-action:none;user-select:none}
+#dock-folder-items.folder-editing .folder-shortcut:nth-child(even){animation-direction:alternate-reverse}
+#dock-folder-items.folder-editing a,#dock-folder-items.folder-editing .folder-open-button{cursor:grab}
+#dock-folder-items .folder-sort-target{outline:2px solid var(--accent);outline-offset:2px;border-radius:14px}
+#folder-sort-hint{font-size:11px;margin:0 0 8px}#folder-sort-done{margin-bottom:10px}
+@media(prefers-reduced-motion:reduce){#dock-folder-items.folder-editing .folder-shortcut{animation:none;outline:1px dashed var(--accent)}}
+#dock-folder-items.folder-editing .folder-shortcut.folder-dragging{animation:none;position:relative;z-index:5;pointer-events:none;opacity:.85;filter:drop-shadow(0 8px 10px #0003)}
+body.dock-editing #bookmarks .bookmark:not(.bookmark-add-item):not(.dock-sort-source){animation:folder-wiggle .18s ease-in-out infinite alternate}
+body.dock-editing #bookmarks .bookmark:nth-child(even){animation-direction:alternate-reverse}
+@media(prefers-reduced-motion:reduce){body.dock-editing #bookmarks .bookmark{animation:none!important}}

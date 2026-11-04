@@ -1,0 +1,20 @@
+{
+  "name": "qipage-startpage",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "栖页 · 浏览器个人起始页",
+  "scripts": {
+    "check": "node scripts/check.mjs",
+    "build": "node scripts/build.mjs && node scripts/check-distribution.mjs",
+    "verify": "npm run check && npm test && npm run build",
+    "test": "node --test tests/*.test.mjs",
+    "test:core": "node --test tests/core.test.mjs"
+  },
+  "engines": {
+    "node": "^20.19.0 || ^22.13.0 || >=24.0.0"
+  },
+  "devDependencies": {
+    "jsdom": "^29.1.1"
+  }
+}

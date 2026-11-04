@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#182c2b">
+  <meta name="description" content="个人起始页，支持搜索、网址导航、待办、便签和计时。">
+  <title>栖页 · 个人起始页</title>
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="layout.css">
+  <script defer src="core.js"></script>
+  <script defer src="engine-icons.js"></script>
+  <script defer src="chrome-extension/bookmark-tree.js"></script>
+  <script defer src="app.js"></script>
+  <script defer src="layout.js"></script>
+</head>
+<body data-view="minimal">
+  <div id="wallpaper" aria-hidden="true"></div>
+  <video id="video-wallpaper" muted loop playsinline aria-hidden="true" hidden></video>
+  <div class="shade" aria-hidden="true"></div>
+  <div id="search-focus-veil" aria-hidden="true"></div>
+  <p id="layout-instructions" class="visually-hidden">右键点击搜索框外的位置可打开操作菜单，选择展开完整主页后切换模式。也可点击右上角按钮或按 Alt+Z 切换，Esc 退出搜索聚焦或收起完整主页。</p>
+  <button id="expand-home" class="expand-home" title="展开完整主页 · Alt+Z" aria-label="展开完整主页" aria-expanded="false" data-icon="maximize"></button>
+  <header class="topbar">
+    <a class="brand" href="index.html" aria-label="栖页首页"><img src="assets/logo.svg" alt=""><span>栖页<span class="brand-dot">.</span></span></a>
+    <div class="top-actions"><button id="zen-toggle" class="icon-button" title="切换主页布局 · Alt+Z" aria-label="切换主页布局" aria-pressed="false" data-icon="maximize"></button><button id="settings-open" class="icon-button" title="个性化设置" aria-label="个性化设置" data-icon="settings"></button></div>
+  </header>
+  <main>
+    <section class="hero" aria-label="时间与搜索">
+      <section id="clock-region" class="clock-region" aria-label="日期与时间">
+        <div class="clock-surface"><h1 id="clock" aria-label="当前时间"><span id="clock-hours" aria-hidden="true">00</span><span class="clock-colon" aria-hidden="true">:</span><span id="clock-minutes" aria-hidden="true">00</span><span class="clock-colon" aria-hidden="true">:</span><span id="clock-seconds" aria-hidden="true">00</span><small class="clock-fraction" aria-hidden="true">.<span id="clock-milliseconds">000</span></small></h1>
+        <p id="date" class="date"></p></div>
+      </section>
+      <form id="search-form" class="search-bar" role="search">
+        <button id="engine-toggle" type="button" class="engine-toggle" aria-label="选择搜索引擎" aria-expanded="false"><span id="engine-symbol"><svg class="engine-glyph" viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></g></svg></span><span data-icon="chevron-down"></span></button>
+        <input id="search" aria-label="搜索关键词或网址" aria-describedby="layout-instructions" placeholder="搜索或输入网址" autocomplete="off" autofocus>
+        <kbd class="search-key">/</kbd><button class="search-submit" aria-label="搜索" data-icon="search"></button>
+        <div id="engine-menu" class="engine-menu" hidden></div>
+      </form>
+      <div class="engine-shortcuts"><div id="engine-tabs" class="engine-tabs" aria-label="快捷切换搜索引擎"></div><button id="engine-manage-shortcut" class="engine-manage-link" title="管理搜索引擎" aria-label="管理搜索引擎" data-icon="sliders"></button></div>
+    </section>
+
+    <div class="dashboard">
+      <section class="navigation" aria-label="快捷导航">
+        <div class="section-header"><div class="group-tabs" id="group-tabs" role="tablist" aria-label="书签分组"></div><div class="section-tools"><button id="manage-bookmarks" class="subtle-button" title="编辑网址与分组" data-icon="sliders" aria-label="编辑网址与分组" aria-pressed="false"></button><button id="add-bookmark" class="subtle-button" data-icon="plus" aria-label="添加网址" title="添加网址"></button></div></div>
+        <div id="group-tools" class="group-tools" hidden><button id="add-group">+ 新建分组</button><button id="rename-group">重命名当前分组</button><button id="delete-group">删除当前分组</button><span>点击网址上的编辑按钮进行修改</span></div>
+        <div class="shortcut-strip"><button id="dock-drag-handle" class="dock-drag-handle" type="button" aria-label="移动 Dock，拖动或使用方向键" title="拖动移动 Dock；方向键微调">⠿</button><div id="bookmarks" class="bookmark-grid" aria-label="快捷方式 Dock"></div></div>
+        <div id="dock-edit-toolbar" class="dock-edit-toolbar" role="group" aria-label="Dock 批量编辑" hidden><span id="dock-selection-count" role="status" aria-live="polite">已选 0 项</span><button id="dock-select-all" type="button">全选</button><button id="dock-delete-selected" type="button" disabled>删除所选</button><button id="dock-create-folder" type="button">新建文件夹</button><button id="dock-import-bookmarks" type="button">导入浏览器书签</button><select id="dock-move-folder" aria-label="将所选网址移入文件夹"><option value="">移入文件夹…</option></select><button id="dock-edit-done" type="button">完成</button><span class="dock-sort-help">拖动图标排序 · 点击下方名称修改 · 勾选批量删除</span><span id="dock-order-status" class="visually-hidden" role="status" aria-live="polite"></span></div>
+      </section>
+
+      <section class="widgets" aria-label="常用工具">
+        <article class="widget todo-card">
+          <div class="widget-heading"><span><span data-icon="check-square"></span> 待办 <small id="todo-count">0/0</small></span><button id="clear-todos" class="tiny-button" aria-label="清除已完成待办" title="清除已完成" data-icon="sweep"></button></div>
+          <div id="todo-list" class="todo-list"></div>
+          <form id="todo-form" class="inline-form"><span data-icon="plus"></span><input id="todo-input" aria-label="添加待办" placeholder="添加待办，回车保存" maxlength="160" required><button aria-label="保存待办" data-icon="arrow-right"></button></form>
+          <div class="todo-bottom"><span id="todo-message">暂无待办</span><div class="progress"><i id="todo-progress"></i></div></div>
+        </article>
+        <article class="widget notes-card">
+          <div class="widget-heading"><span><span data-icon="note"></span> 便签</span><span id="note-status" class="save-status">本地保存</span></div>
+          <textarea id="notes" aria-label="随手记" placeholder="输入便签，自动保存" maxlength="12000"></textarea>
+          <div class="note-footer"><span id="note-length">0 字</span></div>
+        </article>
+        <article class="widget focus-card">
+          <div class="widget-heading"><span><span data-icon="timer"></span> 计时器</span><button id="timer-reset" class="tiny-button" aria-label="重置计时器" title="重置计时器" data-icon="refresh"></button></div>
+          <div class="timer-modes"><button data-minutes="25" class="active">专注</button><button data-minutes="5">短休息</button><button data-minutes="15">长休息</button></div>
+          <div id="timer" class="timer">25<span>:</span>00</div><button id="timer-toggle" class="primary-button"><span data-icon="play"></span><span>开始专注</span></button>
+          <p id="timer-caption" class="muted">未开始</p>
+        </article>
+        <article class="widget weather-card">
+          <div class="widget-heading"><span><span data-icon="cloud-sun"></span> 天气</span><button id="weather-refresh" class="tiny-button" aria-label="刷新天气" title="刷新天气" data-icon="refresh"></button></div>
+          <button id="weather-location" class="weather-location" title="设置天气位置"><span data-icon="pin"></span><span id="weather-city">新加坡</span><span data-icon="chevron-down"></span></button>
+          <div class="weather-main"><span id="weather-temp">--<small>°</small></span><span id="weather-art" class="weather-art" data-icon="cloud-sun"></span></div>
+          <div id="weather-detail" class="muted">正在获取实时天气…</div><div id="weather-forecast" class="forecast"></div>
+          <a class="source" href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">天气数据 · Open-Meteo ↗</a>
+        </article>
+      </section>
+
+      <section class="discovery widget" aria-label="订阅与动态">
+        <div class="discovery-top"><div class="discovery-tabs" role="tablist" aria-label="订阅来源"><button data-feed="rss" class="active" role="tab" aria-selected="true">RSS 订阅</button><button data-feed="github" role="tab" aria-selected="false">GitHub</button></div><button id="feed-refresh" class="tiny-button" aria-label="刷新订阅与动态" title="刷新内容" data-icon="refresh"></button></div>
+        <div id="feed-content"></div>
+      </section>
+    </div>
+  </main>
+  <footer><button id="wallpaper-open"><span data-icon="image"></span> 更换壁纸</button></footer>
+  <div id="toast" class="toast" role="status" hidden></div>
+  <div id="context-menu" class="context-menu" role="menu" aria-label="主页操作" hidden></div>
+  <div id="dock-tooltip" class="dock-tooltip" role="tooltip" hidden></div>
+  <dialog id="browser-bookmarks-dialog" aria-labelledby="browser-bookmarks-title"><div class="dialog-heading"><h2 id="browser-bookmarks-title">导入浏览器书签</h2><button type="button" class="icon-button close-dialog" aria-label="关闭书签导入" data-icon="x"></button></div><p class="muted">只追加所选网址，自动跳过重复地址。待办、便签和设置保留。</p><label class="setting-row">导入分组<select id="browser-bookmarks-group"></select></label><label class="setting-row">保留文件夹层级<input id="browser-bookmarks-folders" type="checkbox" checked></label><p class="muted">勾选文件夹或单个书签。保留原有层级，也可关闭层级直接导入 Dock。</p><div class="dialog-actions"><button id="browser-bookmarks-all" type="button" class="secondary-button">选择可导入项</button><button id="browser-bookmarks-clear" type="button" class="secondary-button">取消选择</button></div><p id="browser-bookmarks-status" class="muted" role="status" aria-live="polite"></p><div id="browser-bookmarks-list" class="browser-bookmarks-list"></div><div class="dialog-actions"><button type="button" class="secondary-button close-dialog">取消</button><button id="browser-bookmarks-confirm" type="button" class="primary-button">确认追加</button></div></dialog>
+  <dialog id="clock-settings-dialog" aria-labelledby="clock-settings-title"><div class="dialog-heading"><div><h2 id="clock-settings-title">时钟外观</h2></div><button type="button" class="icon-button close-dialog" aria-label="关闭时钟设置" data-icon="x"></button></div>
+    <p class="muted">更改即时保存，时间和日期共用字色。自动模式根据时间区域背景及半透明底板，在黑色和白色中选择对比度更高的一种。</p>
+    <label class="setting-row">文字颜色模式<select id="clock-color-mode"><option value="auto">自动高对比</option><option value="manual">手动颜色</option></select></label>
+    <label class="setting-row">文字颜色<input id="clock-color" type="color" value="#ffffff"></label>
+    <label class="setting-row">背景颜色<input id="clock-background-color" type="color" value="#000000"></label>
+    <div class="setting-row"><label for="clock-background-opacity">背景不透明度</label><input id="clock-background-opacity" type="range" min="0" max="60" step="0.01" value="14"><span class="dock-number-field"><input id="clock-background-opacity-value" type="number" min="0" max="60" step="0.01" value="14.00" aria-label="时钟背景不透明度数值"><span>%</span></span></div>
+    <p id="clock-contrast-status" class="muted" role="status" aria-live="polite"></p>
+    <div class="dialog-actions"><button id="clock-detect-color" type="button" class="secondary-button">重新检测背景</button><button type="button" class="primary-button close-dialog">完成</button></div>
+  </dialog>
+  <dialog id="dock-rename-dialog" aria-labelledby="dock-rename-title"><form id="dock-rename-form"><div class="dialog-heading"><h2 id="dock-rename-title">修改显示名称</h2><button type="button" class="icon-button close-dialog" aria-label="关闭名称编辑" data-icon="x"></button></div><label>显示名称<input id="dock-rename-name" maxlength="32" required placeholder="输入图标下方显示的名称"></label><p class="muted">名称会同步显示在 Dock、悬停提示和网址列表中。</p><div class="dialog-actions"><button type="button" class="secondary-button close-dialog">取消</button><button type="submit" class="primary-button">保存名称</button></div></form></dialog>
+  <dialog id="dock-folder-dialog" class="dock-folder-dialog" aria-labelledby="dock-folder-title">
+    <div class="dialog-heading"><div><h2 id="dock-folder-title"></h2><p id="dock-folder-count" class="muted"></p></div><button type="button" class="icon-button close-dialog" aria-label="关闭文件夹" data-icon="x"></button></div>
+    <div class="folder-navigation-row"><nav id="dock-folder-breadcrumbs" aria-label="文件夹路径"></nav><div id="dock-folder-view" class="folder-view-switch" role="group" aria-label="文件夹显示模式"><button type="button" data-folder-view="grid" aria-pressed="true">图标网格</button><button type="button" data-folder-view="list" aria-pressed="false">详细列表</button></div></div>
+    <p id="folder-sort-hint" class="muted">左键长按图标进入编辑模式，拖动调整顺序。</p><button id="folder-sort-done" class="secondary-button" type="button" hidden>完成排序</button>
+    <div id="dock-folder-items" class="dock-folder-items"></div>
+    <p id="dock-folder-empty" class="muted" hidden>文件夹还是空的，点击「整理内容」加入网址。</p>
+    <div class="dialog-actions"><button id="dock-folder-fetch-icons" type="button" class="secondary-button" title="加载当前文件夹及子文件夹的网站图标，保留自定义图标">批量获取图标</button><button id="dock-folder-create-child" type="button" class="secondary-button">新建子文件夹</button><button id="dock-folder-organize" type="button" class="secondary-button">整理内容</button><button type="button" class="primary-button close-dialog">完成</button></div>
+  </dialog>
+  <dialog id="dock-folder-editor" aria-labelledby="dock-folder-editor-title"><form id="dock-folder-form">
+    <div class="dialog-heading"><h2 id="dock-folder-editor-title">新建文件夹</h2><button type="button" class="icon-button close-dialog" aria-label="关闭文件夹编辑" data-icon="x"></button></div>
+    <input id="dock-folder-id" type="hidden"><label>文件夹名称<input id="dock-folder-name" maxlength="32" placeholder="例如：工作、常用工具" required></label>
+    <label>上级文件夹<select id="dock-folder-parent"><option value="">Dock（顶层）</option></select></label>
+    <p id="dock-folder-path" class="muted" role="status" aria-live="polite"></p>
+    <p class="muted">勾选要放入的网址；取消勾选会移回 Dock。来自其他文件夹的网址会移入这里，原有网址分组不变。</p>
+    <div id="dock-folder-picker" class="dock-folder-picker" role="group" aria-label="选择文件夹内容"></div>
+    <div class="dialog-actions"><button id="dock-folder-delete" type="button" class="secondary-button" hidden>删除文件夹及内容</button><button id="dock-folder-dissolve" type="button" class="secondary-button" hidden>解散文件夹</button><button type="submit" class="primary-button">保存文件夹</button></div>
+  </form></dialog>
+  <dialog id="paste-dialog" aria-labelledby="paste-title"><form id="paste-form"><div class="dialog-heading"><h2 id="paste-title">粘贴内容</h2><button type="button" class="icon-button close-dialog" aria-label="关闭粘贴窗口" data-icon="x"></button></div><p class="muted">浏览器未开放剪贴板读取。请在下方按 Ctrl+V（Mac 为 ⌘V），再确认粘贴。</p><textarea id="paste-content" aria-label="要粘贴的内容" placeholder="在这里粘贴…" rows="4" required></textarea><div class="dialog-actions"><button type="button" class="secondary-button close-dialog">取消</button><button class="primary-button" type="submit">确认粘贴</button></div></form></dialog>
+
+  <dialog id="bookmark-dialog"><form id="bookmark-form"><div class="dialog-heading"><div><h2 id="bookmark-title">添加快捷网址</h2></div><button type="button" class="icon-button close-dialog" aria-label="关闭" data-icon="x"></button></div><input type="hidden" id="bookmark-id"><label>网站地址<input id="bookmark-url" placeholder="https://github.com" required></label><label>网站名称<input id="bookmark-name" maxlength="32" placeholder="输入网址后自动获取，仍可修改" required></label><label>所属分组<select id="bookmark-group"></select></label><div class="engine-icon-heading"><span>统一图标</span><span id="bookmark-icon-preview" aria-hidden="true"></span></div><button id="bookmark-fetch-icon" class="secondary-button" type="button">自动获取网站图标</button><div class="setting-row bookmark-gray-control"><span>图标灰度</span><input id="bookmark-icon-gray" type="range" min="0" max="100" step="0.01" value="20" aria-label="图标灰度"><span class="dock-number-field"><input id="bookmark-icon-gray-value" type="number" min="0" max="100" step="0.01" value="20.00" aria-label="图标灰度数值"><span>%</span></span></div><p class="muted">0% 保留原色，100% 黑白；默认仅轻度去色，可随时修改。跨域限制下无法读取名称时，自动使用域名。</p><div id="bookmark-icon-picker" class="engine-icon-picker" role="group" aria-label="选择快捷方式图标"></div><label>自定义上传 <span class="muted">自动转为单色，推荐透明底 PNG，最大 5 MB</span><input id="bookmark-icon" type="file" accept="image/png,image/jpeg,image/webp,image/gif"></label><p id="bookmark-icon-status" class="muted" role="status">填写网址后自动获取网站图标并转为主题单色；获取失败时使用本地图形。</p><div class="dialog-actions"><button id="remove-icon" type="button" class="secondary-button">恢复自动统一图标</button><button class="primary-button" type="submit">保存网址</button></div></form></dialog>
+
+  <dialog id="group-dialog"><form id="group-form"><div class="dialog-heading"><h2 id="group-title">新建分组</h2><button type="button" class="icon-button close-dialog" aria-label="关闭" data-icon="x"></button></div><label>分组名称<input id="group-name" maxlength="16" required></label><button class="primary-button" type="submit">保存分组</button></form></dialog>
+
+  <dialog id="weather-dialog"><div class="dialog-heading"><div><h2>天气设置</h2></div><button class="icon-button close-dialog" aria-label="关闭" data-icon="x"></button></div><label class="setting-row">允许天气联网<input type="checkbox" id="weather-enabled" role="switch"></label><p class="muted">开启后，Open-Meteo 会接收近似坐标和你的网络 IP。定位坐标保留一位小数（纬度约 11 公里网格，经度间距随纬度变化）。关闭后停止天气与城市搜索请求。</p><form id="city-form" class="city-form"><input id="city-input" placeholder="搜索城市，如：上海 / Singapore" aria-label="城市名称" required><button class="primary-button">搜索</button></form><button id="locate" class="secondary-button"><span data-icon="pin"></span> 使用近似当前位置</button><p id="city-status" class="muted">选择城市后会记住，下次不必重新设置。</p><div id="city-results"></div></dialog>
+
+  <dialog id="engine-manager-dialog" class="engine-manager-dialog" aria-labelledby="engine-manager-title">
+    <div class="dialog-heading"><div><h2 id="engine-manager-title">搜索引擎</h2></div><button class="icon-button close-dialog" aria-label="关闭搜索引擎管理" data-icon="x"></button></div>
+    <p class="muted">编辑名称、图标和搜索网址；勾选“快捷栏”即可显示在搜索框下方。上下移动可调整顺序。</p>
+    <div class="engine-manager-toolbar"><span id="engine-manager-count" class="muted"></span><button id="engine-add" class="primary-button" type="button"><span data-icon="plus"></span>新增引擎</button></div>
+    <div id="engine-manager-list" class="engine-manager-list"></div>
+    <div class="engine-manager-footer"><button id="engine-restore" class="secondary-button" type="button">恢复内置引擎</button><span class="muted">修改自动保存，也会随 JSON 备份导出。</span></div>
+  </dialog>
+  <dialog id="engine-editor-dialog" aria-labelledby="engine-editor-title"><form id="engine-editor-form">
+    <div class="dialog-heading"><div><h2 id="engine-editor-title">新增搜索引擎</h2></div><button type="button" class="icon-button close-dialog" aria-label="关闭引擎编辑" data-icon="x"></button></div>
+    <input type="hidden" id="custom-engine-id">
+    <label for="custom-engine-name">引擎名称</label><input id="custom-engine-name" maxlength="32" placeholder="例如：百度" required>
+    <div class="engine-icon-heading"><label>图形图标</label><span id="custom-engine-preview" class="engine-badge" aria-hidden="true"></span></div>
+    <div id="engine-icon-picker" class="engine-icon-picker" role="group" aria-label="选择引擎图标"></div>
+    <div class="engine-field-row"><div><label for="custom-engine-symbol">自定义 Emoji / 文字（可选）</label><input id="custom-engine-symbol" maxlength="8" placeholder="默认使用上方图形图标"></div><div><label for="custom-engine-key">快捷指令（可选）</label><input id="custom-engine-key" maxlength="8" pattern="[A-Za-z][A-Za-z0-9]{0,7}" placeholder="例如：bd" autocapitalize="off" spellcheck="false"></div></div>
+    <label for="custom-engine-url">搜索网址模板</label><input id="custom-engine-url" maxlength="2048" placeholder="https://www.baidu.com/s?wd={query}" inputmode="url" required>
+    <p class="muted">将网址中的搜索词替换为 <code>{query}</code>，必须且只能出现一次。关键词会自动进行 URL 编码。快捷指令输入后加空格即可切换。</p>
+    <label class="engine-pinned-label"><input type="checkbox" id="custom-engine-pinned">显示在搜索框下方的快捷栏</label>
+    <div class="dialog-actions"><button type="button" class="secondary-button close-dialog">取消</button><button type="submit" class="primary-button">保存引擎</button></div>
+  </form></dialog>
+
+  <dialog id="settings-dialog" class="settings-dialog"><div class="dialog-heading"><div><h2>个性化设置</h2></div><button class="icon-button close-dialog" aria-label="关闭" data-icon="x"></button></div>
+    <section class="settings-section"><h3>搜索引擎</h3><p class="muted">内置 18 种搜索，支持自定义网址、快捷指令和快捷栏排序。</p><button id="engine-settings-open" class="secondary-button"><span data-icon="sliders"></span>管理搜索引擎</button></section>
+    <section class="settings-section"><h3>外观</h3><button id="clock-settings-open" type="button" class="secondary-button">时钟外观</button><label class="setting-row">界面主题<select id="theme"><option value="dark">深色 · 静谧</option><option value="light">浅色 · 晴朗</option><option value="system">跟随系统</option></select></label><label class="setting-row">主题色来源<select id="theme-color-mode"><option value="manual">手动选择</option><option value="wallpaper">跟随壁纸</option></select></label><div class="setting-row theme-color-row"><label for="theme-color-picker">主题色</label><input id="theme-color-picker" type="color" value="#3b6957" aria-label="选择主题色"><input id="theme-color-hex" type="text" maxlength="7" value="#3b6957" aria-label="主题色 HEX 色值" spellcheck="false"></div><div class="theme-color-presets" role="group" aria-label="推荐主题色"><button type="button" data-theme-color="#3b6957" style="--swatch-color:#3b6957" aria-label="森林绿"></button><button type="button" data-theme-color="#537ea5" style="--swatch-color:#537ea5" aria-label="湖水蓝"></button><button type="button" data-theme-color="#8966a6" style="--swatch-color:#8966a6" aria-label="暮光紫"></button><button type="button" data-theme-color="#b56c83" style="--swatch-color:#b56c83" aria-label="蔷薇粉"></button><button type="button" data-theme-color="#b18045" style="--swatch-color:#b18045" aria-label="暖琥珀"></button><button type="button" data-theme-color="#657387" style="--swatch-color:#657387" aria-label="雾灰蓝"></button></div><button id="theme-color-refresh" class="secondary-button" type="button">从当前壁纸重新取色</button><p id="theme-color-status" class="muted" role="status" aria-live="polite">手动主题色会即时应用；选择颜色将切回手动模式。</p><label class="setting-row">图标大小 <input id="icon-size" type="range" min="36" max="68" step="4"><output id="icon-size-value"></output></label><label class="setting-row">每行网址 <select id="columns"><option value="6">6 个</option><option value="8">8 个</option><option value="10">10 个</option></select></label><label class="setting-row">面板底色强度<input id="opacity" type="range" min="15" max="95"><output id="opacity-value"></output></label></section>
+    <section class="settings-section"><h3>壁纸</h3><div class="wallpaper-options"><button data-wallpaper="forest" class="swatch forest" aria-label="雾中青山" title="雾中青山"><span>雾中青山</span></button><button data-wallpaper="dusk" class="swatch dusk" aria-label="落日余温" title="落日余温"><span>落日余温</span></button><button data-wallpaper="ocean" class="swatch ocean" aria-label="深海来信" title="深海来信"><span>深海来信</span></button></div><label class="upload-button"><span data-icon="upload"></span> 上传图片 / 视频壁纸<input type="file" id="wallpaper-upload" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm" hidden></label><p id="wallpaper-status" class="muted">图片或无声循环视频，最大 30 MB，仅保存在此浏览器。</p></section>
+    <section class="settings-section"><h3>显示内容</h3><button id="dock-settings-open" class="secondary-button" type="button">Dock 专属设置</button><label class="setting-row">常用工具<input type="checkbox" id="show-widgets" role="switch"></label><label class="setting-row">订阅与动态<input type="checkbox" id="show-discovery" role="switch"></label><label class="setting-row">搜索结果在新标签页打开<input type="checkbox" id="new-tab" role="switch"></label><p class="muted">快捷键：/ 搜索 · Alt+Z 切换布局 · Esc 关闭窗口 / 收起主页</p></section>
+    <section class="settings-section"><h3>数据与备份</h3><p class="muted">网址、待办、便签和设置保存在当前浏览器。导出备份可在其他设备恢复，包含自定义壁纸。</p><p class="muted">便签、待办和备份以明文保存，请勿填写密码或令牌；备份可能包含近似位置，请妥善保管。</p><div class="backup-actions"><label class="secondary-button">导入浏览器书签<input id="browser-bookmarks-file" type="file" accept="application/json,.json" hidden></label><button id="export-data" class="secondary-button"><span data-icon="download"></span> 导出 JSON</button><label class="secondary-button">导入备份<input type="file" id="import-data" accept="application/json,.json" hidden></label></div><p class="muted">导入备份会替换当前数据；浏览器书签仅追加。先在扩展设置中读取书签并下载导入文件。</p><div id="import-confirm" hidden><p>备份已验证。导入后天气联网将关闭，需重新手动开启。确定替换当前数据？</p><button id="confirm-import" class="primary-button">确认导入</button><button id="cancel-import" class="secondary-button">取消</button></div></section>
+    <p class="settings-signature">栖页 <span>·</span> 为每一个新的开始</p>
+  </dialog>
+  <dialog id="dock-settings-dialog" class="settings-dialog"><div class="dialog-heading"><div><h2>Dock 设置</h2></div><button class="icon-button close-dialog" aria-label="关闭 Dock 设置" data-icon="x"></button></div>
+    <p class="muted">调整即时预览，保存后生效；关闭时可选择保存或放弃。点击右侧数字可直接输入，支持两位小数。</p>
+    <section class="settings-section"><h3>位置与尺寸</h3>
+      <label class="setting-row">停靠位置<select id="dock-position"><option value="bottom">底部居中</option><option value="top">顶部居中</option><option value="left">靠左居中</option><option value="right">靠右居中</option><option value="custom">自由位置</option></select></label>
+      <label class="setting-row">允许拖动位置<input type="checkbox" id="dock-movable" role="switch"></label><p class="muted">开启后拖动 Dock 左侧手柄自由移动；聚焦手柄可按方向键微调。位置自动限制在窗口内。</p>
+      <label class="setting-row">水平位置<input id="dock-x" type="range" min="0" max="100" step="0.01"><span class="dock-number-field"><input id="dock-x-value" type="number" min="0" max="100" step="0.01" aria-label="水平位置数值" title="范围 0–100%"><span>%</span></span></label>
+      <label class="setting-row">垂直位置<input id="dock-y" type="range" min="0" max="100" step="0.01"><span class="dock-number-field"><input id="dock-y-value" type="number" min="0" max="100" step="0.01" aria-label="垂直位置数值" title="范围 0–100%"><span>%</span></span></label>
+      <label class="setting-row">图标大小<input id="dock-size" type="range" min="16" max="160" step="0.01"><span class="dock-number-field"><input id="dock-size-value" type="number" min="16" max="160" step="0.01" aria-label="图标大小数值" title="范围 16–160px"><span>px</span></span></label>
+      <label class="setting-row">图标间距<input id="dock-gap" type="range" min="0" max="160" step="0.01"><span class="dock-number-field"><input id="dock-gap-value" type="number" min="0" max="160" step="0.01" aria-label="图标间距数值" title="范围 0–160px"><span>px</span></span></label>
+      <label class="setting-row">最大宽度<input id="dock-width" type="range" min="120" max="3840" step="0.01"><span class="dock-number-field"><input id="dock-width-value" type="number" min="120" max="3840" step="0.01" aria-label="最大宽度数值" title="范围 120–3840px"><span>px</span></span></label>
+      <label class="setting-row">托盘不透明度<input id="dock-opacity" type="range" min="0" max="100" step="0.01"><span class="dock-number-field"><input id="dock-opacity-value" type="number" min="0" max="100" step="0.01" aria-label="托盘不透明度数值" title="范围 0–100%"><span>%</span></span></label>
+    </section>
+    <section class="settings-section"><h3>悬停与名称</h3>
+      <label class="setting-row">悬停放大<input type="checkbox" id="dock-zoom" role="switch"></label>
+      <label class="setting-row">放大倍率<input id="dock-scale" type="range" min="1" max="4" step="0.01"><span class="dock-number-field"><input id="dock-scale-value" type="number" min="1" max="4" step="0.01" aria-label="放大倍率数值" title="范围 1–4×"><span>×</span></span></label>
+      <label class="setting-row">影响范围<input id="dock-radius" type="range" min="20" max="600" step="0.01"><span class="dock-number-field"><input id="dock-radius-value" type="number" min="20" max="600" step="0.01" aria-label="影响范围数值" title="范围 20–600px"><span>px</span></span></label>
+      <label class="setting-row">动画过渡时间<input id="dock-speed" type="range" min="0" max="2000" step="0.01"><span class="dock-number-field"><input id="dock-speed-value" type="number" min="0" max="2000" step="0.01" aria-label="动画过渡时间数值" title="范围 0–2000ms"><span>ms</span></span></label>
+      <label class="setting-row">名称字号<input id="dock-name-size" type="range" min="8" max="32" step="0.01"><span class="dock-number-field"><input id="dock-name-size-value" type="number" min="8" max="32" step="0.01" aria-label="名称字号数值" title="范围 8–32px"><span>px</span></span></label>
+      <label class="setting-row">下方显示网站名称<input type="checkbox" id="dock-show-names" role="switch"></label>
+      <label class="setting-row">悬停浮动名称<input type="checkbox" id="dock-tooltip-enabled" role="switch"></label>
+    </section>
+    <div class="dialog-actions"><button id="dock-reset" class="secondary-button" type="button">恢复 Dock 默认设置</button><button id="dock-save" class="primary-button" type="button">保存</button></div>
+  </dialog>
+  <dialog id="dock-save-dialog" aria-labelledby="dock-save-title"><h2 id="dock-save-title">保存 Dock 设置？</h2><p class="muted">已预览的修改尚未保存，放弃后将恢复原来的设置。</p><div class="dialog-actions"><button class="secondary-button close-dialog" type="button">继续编辑</button><button id="dock-discard" class="secondary-button" type="button">放弃修改</button><button id="dock-confirm-save" class="primary-button" type="button">保存并关闭</button></div></dialog>
+  <dialog id="group-delete-dialog" aria-labelledby="group-delete-title"><h2 id="group-delete-title">删除分组</h2><p id="group-delete-message"></p><div class="dialog-actions"><button type="button" class="secondary-button close-dialog">取消</button><button id="group-delete-keep" type="button" class="secondary-button">仅删分组，保留网址</button><button id="group-delete-all" type="button" class="primary-button">删除分组及网址</button></div></dialog>
+  <dialog id="confirm-dialog"><h2 id="confirm-title">确认删除</h2><p id="confirm-message"></p><div class="dialog-actions"><button class="secondary-button close-dialog">取消</button><button id="confirm-action" class="primary-button">确认删除</button></div></dialog>
+</body>
+</html>
